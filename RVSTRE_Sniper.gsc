@@ -6,18 +6,19 @@ Init()
 	
 	level.Anti_Hardscope = true;
 	level.Anti_DropShot = true;
-	
+
 	setDvar("sv_enableDoubleTaps", 1);
 	setDvar("g_gametype", 1);
 
-    SetDvar("g_TeamName_Axis", "^1Others");
-    SetDvar("g_TeamName_Allies", "^5RVSTRE");
+    	SetDvar("g_TeamName_Axis", "^1Others");
+    	SetDvar("g_TeamName_Allies", "^5RVSTRE");
 
-    SetDvar("g_TeamIcon_Allies", "iw5_cardicon_nuke");
-    SetDvar("g_TeamIcon_Axis", "iw5_cardicon_smiley");
-
+	SetDvar("g_TeamIcon_Allies", "iw5_cardicon_nuke");
+    	SetDvar("g_TeamIcon_Axis", "iw5_cardicon_smiley");
+	
+	
 	level.callbackplayerdamagestub = level.callbackplayerdamage;
-    level.callbackplayerdamage = ::DisableDamages;	
+    	level.callbackplayerdamage = ::DisableDamages;	
 	
 	DeletesBombs();
 	
@@ -55,7 +56,6 @@ OnPlayerConnected()
 		player thread DisplayHud();
 		player thread KillstreakPlayer();
 		player thread AntiHardscope();
-		player thread AntiDS();
 	}
 }
 OnPlayerSpawned()
@@ -64,6 +64,7 @@ OnPlayerSpawned()
 	for (;;)
     {
         self waittill("changed_kit");
+		self thread AntiDS();
 		if(isSubStr(self GetCurrentWeapon(), "usp") || isSniper(self GetCurrentWeapon()) == false)
 			GiveIntervention();		
 	}	
@@ -91,7 +92,7 @@ DisplayHud()
 
     self.someText = self createFontString("Objective", 1f);
     self.someText setPoint("BOTTOMCENTER", "BOTTOMCENTER");
-    self.someText setText("^5Name^7: " + self.Name + " ^5Slot^7: " + self GetEntityNumber());
+    self.someText setText("^5Name: ^7" + self.Name + " ^5Slot: ^7" + self GetEntityNumber());
 }
 
 AntiHardscope()
@@ -110,7 +111,7 @@ AntiHardscope()
 			adscycle = 0;
 		}
 		
-		if(adscycle >= 13)
+		if(adscycle >= 9)
 		{
 			adscycle = 0;
 			self AllowAds(false);
@@ -176,18 +177,45 @@ DeletesBombs()
 
 DisableDamages( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset )
 {
-	iDamage = 0;
-	if (sMeansOfDeath == "MOD_MELEE")
+    if (isSniper(sWeapon))
+    {
+		iDamage = 500;
+    }
+	else
 	{
 		iDamage = 0;
-	}				
+	}
 	if (sMeansOfDeath == "MOD_FALLING")
 	{
 		self.health += iDamage;
 	}
-	if(isSniper(sWeapon))
+	
+	if (isDefined(eAttacker))
 	{
-		iDamage = 999;
+		if (isDefined(eAttacker.guid) && isDefined(self.guid))
+		{
+			if (eAttacker.guid == self.guid)
+			{
+				switch (sMeansOfDeath)
+				{
+					case "MOD_PROJECTILE_SPLASH": iDamage = 0;
+					break;
+					case "MOD_GRENADE_SPLASH": iDamage = 0;
+					break;
+					case "MOD_EXPLOSIVE": iDamage = 0;
+					break;					
+					case "MOD_FALLING": iDamage = 0;
+					break;
+				}
+			}
+			else
+			{
+				if (sMeansOfDeath == "MOD_MELEE")
+				{
+					iDamage = 0;
+				}
+			}
+		}
 	}
 	self [[level.callbackplayerdamagestub]]( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset );
 }
