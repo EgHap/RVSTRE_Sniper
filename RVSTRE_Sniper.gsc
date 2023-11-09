@@ -129,7 +129,6 @@ AntiHardscope()
 AntiDS()
 {
     self endon("disconnect");
-    self endon("death");
 
     for(;;)
     {
