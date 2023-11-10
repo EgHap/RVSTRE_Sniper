@@ -179,18 +179,45 @@ DeletesBombs()
 
 DisableDamages( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset )
 {
-	iDamage = 0;
-	if (sMeansOfDeath == "MOD_MELEE")
+    if (isSniper(sWeapon))
+    {
+		iDamage = 500;
+    }
+	else
 	{
 		iDamage = 0;
-	}				
+	}
 	if (sMeansOfDeath == "MOD_FALLING")
 	{
 		self.health += iDamage;
 	}
-	if(isSniper(sWeapon))
+	
+	if (isDefined(eAttacker))
 	{
-		iDamage = 999;
+		if (isDefined(eAttacker.guid) && isDefined(self.guid))
+		{
+			if (eAttacker.guid == self.guid)
+			{
+				switch (sMeansOfDeath)
+				{
+					case "MOD_PROJECTILE_SPLASH": iDamage = 0;
+					break;
+					case "MOD_GRENADE_SPLASH": iDamage = 0;
+					break;
+					case "MOD_EXPLOSIVE": iDamage = 0;
+					break;					
+					case "MOD_FALLING": iDamage = 0;
+					break;
+				}
+			}
+			else
+			{
+				if (sMeansOfDeath == "MOD_MELEE")
+				{
+					iDamage = 0;
+				}
+			}
+		}
 	}
 	self [[level.callbackplayerdamagestub]]( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset );
 }
