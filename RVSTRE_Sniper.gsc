@@ -8,7 +8,6 @@ Init()
 	level.Anti_DropShot = true;
 	
 	setDvar("sv_enableDoubleTaps", 1);
-	setDvar("g_gametype", 1);
 
     SetDvar("g_TeamName_Axis", "^1Others");
     SetDvar("g_TeamName_Allies", "^5RVSTRE");
