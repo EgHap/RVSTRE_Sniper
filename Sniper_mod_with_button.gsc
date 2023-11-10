@@ -1,8 +1,8 @@
 #include maps\mp\gametypes\_hud_util;
-//#include common_scripts\utility;
 
 Init()
 {
+    replacefunc(maps\mp\_utility::allowTeamChoice, ::ReplaceAllowTeamChoice);	
     setDvar("sv_enableDoubleTaps", 1);
 
     SetDvar("g_TeamName_Axis", "^1Others");
@@ -25,6 +25,11 @@ Init()
 
 	level thread OnPlayerConnect();
 	AntiPlant();
+}
+
+ReplaceAllowTeamChoice()
+{
+	return false;
 }
 
 OnPlayerConnect()
